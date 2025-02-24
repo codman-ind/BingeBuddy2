@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/public/style.css">
+    <style>
+        body {
+            background-color: #141414;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            text-align: center;
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .genre {
+            font-size: 14px;
+            color: #bbb;
+        }
+        .back-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 20px;
+            background: red;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            max-width: 200px;
+        }
+        .back-btn:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">Recommendations for "<%= query %>"</h1>
+
+        <% if (recommendations && recommendations.length > 0) { %>
+            <div class="grid">
+                <% recommendations.forEach(item => { %>
+                    <div class="card">
+                        <img src="<%= item.image %>" alt="<%= item.title %>">
+                        <div class="card-info">
+                            <p class="card-title"><%= item.title %></p>
+                            <p class="genre"><%= item.genre %> | Available on: <%= item.platform %></p>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p class="text-lg text-gray-400 text-center">No recommendations found.</p>
+        <% } %>
+
+        <a href="/" class="back-btn">Go Back</a>
+    </div>
+</body>
+</html>

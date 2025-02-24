@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie & Music Recommendations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: flex;
+            animation: slide 20s infinite alternate;
+        }
+        .background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            position: absolute;
+            animation: fade 10s infinite alternate;
+        }
+        @keyframes fade {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+        .glass-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(255, 255, 255, 0.2);
+        }
+        .input-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+        .input-box:focus {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.8);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-black text-white flex justify-center items-center h-screen">
+    <div class="background">
+        <img src="/images/tyson-moultrie-BQTHOGNHo08-unsplash.jpg" alt="Movie Collage">
+    </div>
+    <div class="relative max-w-lg mx-auto p-8 rounded-lg shadow-xl text-center glass-container">
+        <h1 class="text-3xl font-bold mb-6 text-orange-400 drop-shadow-md">Find Your Next Favorite Movie, Show, or Song</h1>
+        <form action="/recommend" method="POST" class="space-y-6">
+            <input type="text" name="query" placeholder="Enter a movie, song, or TV show..." required 
+                class="w-full p-3 text-black text-lg rounded-md input-box">
+            <button type="submit" 
+                class="w-full p-3 bg-orange-500 hover:bg-orange-600 rounded-md text-white font-semibold text-lg transition-transform transform hover:scale-105 shadow-lg">
+                Get Recommendations
+            </button>
+        </form>
+    </div>
+</body>
+</html>
