@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
 
 router.post("/recommend", async (req, res) => {
     const userInput = req.body.query;
-    
+
     try {
         // Fetch recommendations from Gemini API
         const geminiResponse = await axios.post(
@@ -18,7 +18,7 @@ router.post("/recommend", async (req, res) => {
                     {
                         parts: [
                             {
-                                text: `Based on the input "${userInput}", determine whether it is a movie, TV show, or song. Then, suggest exactly 7 very similar recommendations of the same type. Format each recommendation as: "Title - Type". Only return the list, also explanations.`
+                                text: `Based on the input "${userInput}", determine whether it is a movie, TV show, or song. Then, suggest exactly 7 very similar recommendations of the same type. Format each recommendation as: "Title - Type". Only return the list, no explanations.`
                             }
                         ]
                     }
@@ -45,9 +45,10 @@ router.post("/recommend", async (req, res) => {
 
         // API Keys
         const omdbApiKey = process.env.OMDB_API_KEY;
+        const watchmodeApiKey = process.env.WATCHMODE_API_KEY;
         const lastFmApiKey = process.env.LAST_FM_API_KEY;
 
-        if (!omdbApiKey || !lastFmApiKey) {
+        if (!omdbApiKey || !watchmodeApiKey || !lastFmApiKey) {
             throw new Error("API keys are missing in environment variables.");
         }
 
@@ -61,18 +62,32 @@ router.post("/recommend", async (req, res) => {
                             params: { t: item.title, apiKey: omdbApiKey }
                         });
 
+                        let poster = "/images/default.jpg";
+                        let genre = "Unknown";
+
                         if (omdbResponse.data.Response === "True") {
-                            return {
-                                title: omdbResponse.data.Title,
-                                type: item.type,
-                                image: omdbResponse.data.Poster !== "N/A" ? omdbResponse.data.Poster : "/images/default.jpg",
-                                genre: omdbResponse.data.Genre || "Unknown",
-                                platform: "N/A"
-                            };
-                        } else {
-                            console.error(`OMDb API Error for ${item.title}: ${omdbResponse.data.Error}`);
-                            return null; // Skip invalid results
+                            poster = omdbResponse.data.Poster !== "N/A" ? omdbResponse.data.Poster : poster;
+                            genre = omdbResponse.data.Genre || genre;
                         }
+
+                        // If OMDb doesn't have a poster, try Watchmode API
+                        if (poster === "/images/default.jpg") {
+                            const watchmodeResponse = await axios.get("https://api.watchmode.com/v1/search/", {
+                                params: { search_field: "name", search_value: item.title, apiKey: watchmodeApiKey }
+                            });
+
+                            if (watchmodeResponse.data.title_results.length > 0) {
+                                poster = watchmodeResponse.data.title_results[0].poster_url || poster;
+                            }
+                        }
+
+                        return {
+                            title: item.title,
+                            type: item.type,
+                            image: poster,
+                            genre: genre,
+                            platform: "N/A"
+                        };
                     } else if (item.type.includes("song")) {
                         // Fetch song album art from Last.fm API
                         const lastFmResponse = await axios.get("http://ws.audioscrobbler.com/2.0/", {
